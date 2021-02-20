@@ -1,6 +1,6 @@
 use std::io::prelude::*;
 
-fn crun(ipnport: &str) {
+fn crun(ipnport: &str, nickn: &str) {
     let mut stream = std::net::TcpStream::connect(ipnport).expect("Could not connect...");
     let mut srey = stream.try_clone().unwrap();
     let (tx, rx) = std::sync::mpsc::channel();
@@ -8,8 +8,9 @@ fn crun(ipnport: &str) {
         synco(&mut srey, rx);
     });
     loop {
-        let mut input = String::new();
+        let mut input = String::from(format!("{}: ", nickn));
         let in_data: &[u8];
+        let _ = std::io::stdout().flush();
         match std::io::stdin().read_line(&mut input) {
             Ok(_) => {
                 in_data = input.as_bytes();
@@ -44,20 +45,21 @@ fn main() -> Result<(), std::io::Error> {
 
     let mut args = std::env::args().skip(1);
     let mut is_sorver = true;
-    match args.next().expect("Usage: ./netio [server/client] [ip:port]").as_str() {
+    match args.next().expect("Usage: ./netio [server/client] [ip:port] [nickname]").as_str() {
         "server" => { is_sorver = true; },
         "client" => { is_sorver = false; },
-        _ => println!("Usage: ./netio [server/client] [ip:port]"),
+        _ => println!("Usage: ./netio [server/client] [ip:port] [nickname]"),
     }
-    let hostip = args.next().expect("Usage: ./netio [server/client] [ip:port]");
+    let hostip = args.next().expect("Usage: ./netio [server/client] [ip:port] [nickname]");
+    let nick = args.next().expect("Usage: ./netio [server/client] [ip:port] [nickname]");
     match is_sorver {
         true => {
             println!("Hosting on {}", hostip);
-            srun(&hostip);
+            srun(&hostip, &nick);
         },
         false => {
             println!("Connecting to {}", hostip);
-            crun(&hostip);
+            crun(&hostip, &nick);
         },
     }
 
@@ -65,7 +67,7 @@ fn main() -> Result<(), std::io::Error> {
     Ok(())
 }
 
-fn srun(ipnport: &str) {
+fn srun(ipnport: &str, nickn: &str) {
     let listener = std::net::TcpListener::bind(ipnport).expect("Could not bind...");
     loop {
         let (mut stream, socket_addr) = listener.accept().expect("Failed to accept...");
@@ -76,8 +78,9 @@ fn srun(ipnport: &str) {
         });
         println!("{} has connected...", socket_addr);
         loop {
-            let mut input = String::new();
+            let mut input = String::from(format!("{}: ", nickn));
             let in_data: &[u8];
+            let _ = std::io::stdout().flush();
             match std::io::stdin().read_line(&mut input) {
                 Ok(_) => {
                     in_data = input.as_bytes();
