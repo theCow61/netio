@@ -8,7 +8,7 @@ fn crun(ipnport: &str, nickn: &str) {
         synco(&mut srey, rx);
     });
     loop {
-        let mut input = String::from(format!("{}: ", nickn));
+        let mut input = String::from(format!("\x1b[32;1m{}: \x1b[0m", nickn));
         let in_data: &[u8];
         let _ = std::io::stdout().flush();
         match std::io::stdin().read_line(&mut input) {
@@ -78,7 +78,7 @@ fn srun(ipnport: &str, nickn: &str) {
         });
         println!("{} has connected...", socket_addr);
         loop {
-            let mut input = String::from(format!("{}: ", nickn));
+            let mut input = String::from(format!("\x1b[31;1m{}: \x1b[0m", nickn));
             let in_data: &[u8];
             let _ = std::io::stdout().flush();
             match std::io::stdin().read_line(&mut input) {
